@@ -31,10 +31,17 @@
             margin-bottom: 5px;
         }
         input {
-            width: 100%;
+            width: calc(100% - 110px);
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            display: inline-block;
+        }
+        .checkbox-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 10px;
         }
         button {
             width: 100%;
@@ -58,15 +65,23 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .file-list {
+        .file-list, .folder-list {
             margin-top: 20px;
         }
-        .file-item {
+        .file-item, .folder-item {
             margin-bottom: 10px;
             padding: 10px;
             background: #f4f4f9;
             border: 1px solid #ddd;
             border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .folder-item img {
+            width: 24px;
+            height: 24px;
         }
     </style>
 </head>
@@ -82,7 +97,7 @@
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
-                <div>
+                <div class="checkbox-group">
                     <input type="checkbox" id="showLoginPassword" onclick="togglePassword('loginPassword')">
                     <label for="showLoginPassword">Show Password</label>
                 </div>
@@ -106,7 +121,7 @@
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="signupPassword" name="password" placeholder="Create a password" required>
-                <div>
+                <div class="checkbox-group">
                     <input type="checkbox" id="showSignupPassword" onclick="togglePassword('signupPassword')">
                     <label for="showSignupPassword">Show Password</label>
                 </div>
@@ -118,13 +133,18 @@
     <!-- Folder Interface -->
     <div class="folder" id="folderInterface">
         <h2>My Folder</h2>
-        <div class="form-group">
-            <label for="newFile">Add a File</label>
-            <input type="text" id="newFile" placeholder="Enter file name">
-            <button onclick="addFile()">Add File</button>
+        <div class="folder-list" id="folderList">
+            <h3>Folders</h3>
+            <!-- Example Folder -->
+            <div class="folder-item" onclick="openFolder('Example Folder')">
+                <img src="https://cdn-icons-png.flaticon.com/512/715/715676.png" alt="Folder Icon">
+                <span>Example Folder</span>
+            </div>
         </div>
-        <div class="file-list" id="fileList">
-            <h3>Files</h3>
+        <div class="form-group">
+            <label for="newFolder">Add a New Folder</label>
+            <input type="text" id="newFolder" placeholder="Enter folder name">
+            <button onclick="addFolder()">Add Folder</button>
         </div>
         <button onclick="logout()">Logout</button>
     </div>
@@ -133,12 +153,6 @@
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             input.type = input.type === "password" ? "text" : "password";
-        }
-
-        function switchForm(formId) {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('signupForm').style.display = 'none';
-            document.getElementById(formId).style.display = 'block';
         }
 
         function handleLogin(event) {
@@ -153,16 +167,22 @@
             document.getElementById('folderInterface').style.display = 'block';
         }
 
-        function addFile() {
-            const fileName = document.getElementById('newFile').value.trim();
-            if (fileName) {
-                const fileList = document.getElementById('fileList');
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.textContent = fileName;
-                fileList.appendChild(fileItem);
-                document.getElementById('newFile').value = '';
+        function addFolder() {
+            const folderName = document.getElementById('newFolder').value.trim();
+            if (folderName) {
+                const folderList = document.getElementById('folderList');
+                const folderItem = document.createElement('div');
+                folderItem.className = 'folder-item';
+                folderItem.onclick = () => openFolder(folderName);
+                folderItem.innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/715/715676.png" alt="Folder Icon">
+                                        <span>${folderName}</span>`;
+                folderList.appendChild(folderItem);
+                document.getElementById('newFolder').value = '';
             }
+        }
+
+        function openFolder(folderName) {
+            alert(`Opened folder: ${folderName}`);
         }
 
         function logout() {
@@ -172,5 +192,7 @@
     </script>
 </body>
 </html>
+
+
 
 
