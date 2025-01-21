@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login and Signup</title>
+    <title>Login and Signup with File Manager</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,22 +26,19 @@
             margin-bottom: 15px;
         }
         label {
-            display: block;
             font-weight: bold;
-            margin-bottom: 5px;
         }
         input {
-            width: calc(100% - 110px);
+            width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            display: inline-block;
         }
         .checkbox-group {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 8px;
-            margin-left: 10px;
+            gap: 10px;
+            margin-top: 5px;
         }
         button {
             width: 100%;
@@ -56,7 +53,7 @@
         button:hover {
             background-color: #4cae4c;
         }
-        .folder {
+        .file-manager {
             display: none;
             width: 100%;
             max-width: 500px;
@@ -65,23 +62,36 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .file-list, .folder-list {
+        .file-drop-area {
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            text-align: center;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+        .file-list {
             margin-top: 20px;
         }
-        .file-item, .folder-item {
+        .file-item {
             margin-bottom: 10px;
             padding: 10px;
-            background: #f4f4f9;
             border: 1px solid #ddd;
             border-radius: 4px;
-            cursor: pointer;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
         }
-        .folder-item img {
-            width: 24px;
-            height: 24px;
+        .toggle-form {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #007bff;
+            cursor: pointer;
+        }
+        .toggle-form:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -104,6 +114,7 @@
             </div>
             <button type="submit">Login</button>
         </form>
+        <div class="toggle-form" onclick="showSignup()">Don't have an account? Sign up</div>
     </div>
 
     <!-- Signup Form -->
@@ -116,7 +127,7 @@
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                <input type="email" id="signupEmail" name="email" placeholder="Enter your email" required>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
@@ -128,23 +139,19 @@
             </div>
             <button type="submit">Sign Up</button>
         </form>
+        <div class="toggle-form" onclick="showLogin()">Already have an account? Log in</div>
     </div>
 
-    <!-- Folder Interface -->
-    <div class="folder" id="folderInterface">
+    <!-- File Manager -->
+    <div class="file-manager" id="fileManager">
         <h2>My Folder</h2>
-        <div class="folder-list" id="folderList">
-            <h3>Folders</h3>
-            <!-- Example Folder -->
-            <div class="folder-item" onclick="openFolder('Example Folder')">
-                <img src="https://cdn-icons-png.flaticon.com/512/715/715676.png" alt="Folder Icon">
-                <span>Example Folder</span>
-            </div>
+        <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
+            Drag & Drop your files here <br> OR <br>
+            <button>Browse Files</button>
+            <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileUpload(event)">
         </div>
-        <div class="form-group">
-            <label for="newFolder">Add a New Folder</label>
-            <input type="text" id="newFolder" placeholder="Enter folder name">
-            <button onclick="addFolder()">Add Folder</button>
+        <div class="file-list" id="fileList">
+            <h3>Uploaded Files</h3>
         </div>
         <button onclick="logout()">Logout</button>
     </div>
@@ -155,43 +162,56 @@
             input.type = input.type === "password" ? "text" : "password";
         }
 
+        function showSignup() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+        }
+
+        function showLogin() {
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
         function handleLogin(event) {
             event.preventDefault();
             document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('folderInterface').style.display = 'block';
+            document.getElementById('fileManager').style.display = 'block';
         }
 
         function handleSignup(event) {
             event.preventDefault();
             document.getElementById('signupForm').style.display = 'none';
-            document.getElementById('folderInterface').style.display = 'block';
+            document.getElementById('fileManager').style.display = 'block';
         }
 
-        function addFolder() {
-            const folderName = document.getElementById('newFolder').value.trim();
-            if (folderName) {
-                const folderList = document.getElementById('folderList');
-                const folderItem = document.createElement('div');
-                folderItem.className = 'folder-item';
-                folderItem.onclick = () => openFolder(folderName);
-                folderItem.innerHTML = `<img src="https://cdn-icons-png.flaticon.com/512/715/715676.png" alt="Folder Icon">
-                                        <span>${folderName}</span>`;
-                folderList.appendChild(folderItem);
-                document.getElementById('newFolder').value = '';
+        function handleFileUpload(event) {
+            const fileList = document.getElementById('fileList');
+            const files = event.target.files;
+
+            for (let i = 0; i < files.length; i++) {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span>${files[i].name}</span>
+                    <button onclick="deleteFile(this)">Delete</button>
+                `;
+                fileList.appendChild(fileItem);
             }
         }
 
-        function openFolder(folderName) {
-            alert(`Opened folder: ${folderName}`);
+        function deleteFile(button) {
+            const fileItem = button.parentElement;
+            fileItem.remove();
         }
 
         function logout() {
-            document.getElementById('folderInterface').style.display = 'none';
+            document.getElementById('fileManager').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
         }
     </script>
 </body>
 </html>
+
 
 
 
