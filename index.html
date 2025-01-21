@@ -49,41 +49,52 @@
         button:hover {
             background-color: #4cae4c;
         }
-        .switch-link {
-            margin-top: 10px;
-            text-align: center;
+        .folder {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .switch-link a {
-            color: #007bff;
-            text-decoration: none;
+        .file-list {
+            margin-top: 20px;
         }
-        .switch-link a:hover {
-            text-decoration: underline;
+        .file-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f4f4f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
+    <!-- Login Form -->
     <div class="container" id="loginForm">
         <h2>Login</h2>
-        <form action="/login" method="POST">
+        <form onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" placeholder="Enter your email" required>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+                <div>
+                    <input type="checkbox" id="showLoginPassword" onclick="togglePassword('loginPassword')">
+                    <label for="showLoginPassword">Show Password</label>
+                </div>
             </div>
             <button type="submit">Login</button>
         </form>
-        <div class="switch-link">
-            Don't have an account? <a href="#" onclick="switchForm('signupForm')">Sign up</a>
-        </div>
     </div>
 
+    <!-- Signup Form -->
     <div class="container" id="signupForm" style="display: none;">
         <h2>Signup</h2>
-        <form action="/signup" method="POST">
+        <form onsubmit="handleSignup(event)">
             <div class="form-group">
                 <label for="fullname">Full Name</label>
                 <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
@@ -94,22 +105,72 @@
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Create a password" required>
+                <input type="password" id="signupPassword" name="password" placeholder="Create a password" required>
+                <div>
+                    <input type="checkbox" id="showSignupPassword" onclick="togglePassword('signupPassword')">
+                    <label for="showSignupPassword">Show Password</label>
+                </div>
             </div>
             <button type="submit">Sign Up</button>
         </form>
-        <div class="switch-link">
-            Already have an account? <a href="#" onclick="switchForm('loginForm')">Login</a>
+    </div>
+
+    <!-- Folder Interface -->
+    <div class="folder" id="folderInterface">
+        <h2>My Folder</h2>
+        <div class="form-group">
+            <label for="newFile">Add a File</label>
+            <input type="text" id="newFile" placeholder="Enter file name">
+            <button onclick="addFile()">Add File</button>
         </div>
+        <div class="file-list" id="fileList">
+            <h3>Files</h3>
+        </div>
+        <button onclick="logout()">Logout</button>
     </div>
 
     <script>
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
         function switchForm(formId) {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('signupForm').style.display = 'none';
             document.getElementById(formId).style.display = 'block';
         }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('folderInterface').style.display = 'block';
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('folderInterface').style.display = 'block';
+        }
+
+        function addFile() {
+            const fileName = document.getElementById('newFile').value.trim();
+            if (fileName) {
+                const fileList = document.getElementById('fileList');
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.textContent = fileName;
+                fileList.appendChild(fileItem);
+                document.getElementById('newFile').value = '';
+            }
+        }
+
+        function logout() {
+            document.getElementById('folderInterface').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
     </script>
 </body>
 </html>
+
 
