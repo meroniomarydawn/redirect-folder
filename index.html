@@ -1,11 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login, Signup, and File Manager</title>
-    <link href="https://cdn.syncfusion.com/ej2/20.3.47/material.css" rel="stylesheet">
-    <script src="https://cdn.syncfusion.com/ej2/20.3.47/dist/ej2.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -75,16 +74,37 @@
 
         #filemanager {
             display: none;
-            width: 80%;
-            height: 80%;
+            width: 90%;
             margin: 20px auto;
-            border: 1px solid #ddd;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            background: #fff;
             border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .hidden {
-            display: none;
+        #filemanager h2 {
+            margin-bottom: 20px;
+        }
+
+        .file-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .file-item button {
+            margin-left: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .file-item button:hover {
+            background: #a71d2a;
         }
     </style>
 </head>
@@ -113,7 +133,12 @@
     </div>
 
     <!-- File Manager -->
-    <div id="filemanager"></div>
+    <div id="filemanager">
+        <h2>File Manager</h2>
+        <button id="add-folder">Add Folder</button>
+        <button id="upload-file">Upload File</button>
+        <div id="file-list"></div>
+    </div>
 
     <script>
         const authContainer = document.getElementById('auth-container');
@@ -121,6 +146,7 @@
         const formTitle = document.getElementById('form-title');
         const toggleSignupBtn = document.getElementById('toggle-signup');
         const fileManagerDiv = document.getElementById('filemanager');
+        const fileList = document.getElementById('file-list');
 
         let isSignup = false;
 
@@ -153,43 +179,32 @@
             // Hide the login/signup form and show the file manager
             authContainer.style.display = 'none';
             fileManagerDiv.style.display = 'block';
-
-            // Initialize the File Manager
-            initializeFileManager();
         });
 
-        // Initialize File Manager Function
-        function initializeFileManager() {
-            const fileManager = new ej.filemanager.FileManager({
-                ajaxSettings: {
-                    url: "https://ej2services.syncfusion.com/production/web-services/api/FileManager/FileOperations",
-                    uploadUrl: "https://ej2services.syncfusion.com/production/web-services/api/FileManager/Upload",
-                    downloadUrl: "https://ej2services.syncfusion.com/production/web-services/api/FileManager/Download",
-                    getImageUrl: "https://ej2services.syncfusion.com/production/web-services/api/FileManager/GetImage"
-                },
-                view: "Details",
-                allowMultiSelection: true,
-                toolbarSettings: {
-                    items: [
-                        "NewFolder",
-                        "Upload",
-                        "Delete",
-                        "Download",
-                        "Rename",
-                        "SortBy",
-                        "Refresh",
-                        "View"
-                    ]
-                },
-                contextMenuSettings: {
-                    file: ["Open", "Download", "Rename", "Delete"],
-                    folder: ["Open", "Rename", "Delete"],
-                    layout: ["SortBy", "View", "Refresh"]
-                }
-            });
+        // File Manager Functionality
+        document.getElementById('add-folder').addEventListener('click', () => {
+            const folderName = prompt('Enter folder name:');
+            if (folderName) {
+                const folder = document.createElement('div');
+                folder.className = 'file-item';
+                folder.textContent = folderName;
+                fileList.appendChild(folder);
+            }
+        });
 
-            fileManager.appendTo("#filemanager");
-        }
+        document.getElementById('upload-file').addEventListener('click', () => {
+            const fileName = prompt('Enter file name:');
+            if (fileName) {
+                const file = document.createElement('div');
+                file.className = 'file-item';
+                file.textContent = fileName;
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => file.remove());
+                file.appendChild(deleteButton);
+                fileList.appendChild(file);
+            }
+        });
     </script>
 </body>
 </html>
