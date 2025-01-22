@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +19,7 @@
             height: 100vh;
         }
 
-        .form-container {
+        .form-container, .file-manager-container {
             width: 100%;
             max-width: 400px;
             background: #fff;
@@ -29,7 +28,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .form-container h2 {
+        .form-container h2, .file-manager-container h2 {
             text-align: center;
             margin-bottom: 20px;
         }
@@ -50,13 +49,6 @@
             border-radius: 4px;
         }
 
-        .form-group .show-password {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-top: 5px;
-        }
-
         .btn {
             width: 100%;
             padding: 10px;
@@ -72,24 +64,25 @@
             background: #0056b3;
         }
 
-        #filemanager {
-            display: none;
-            width: 90%;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        .file-manager {
+            margin-top: 20px;
         }
 
-        #filemanager h2 {
-            margin-bottom: 20px;
+        .file-list {
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f9f9f9;
         }
 
         .file-item {
-            margin: 10px 0;
-            padding: 10px;
-            background: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            margin-bottom: 5px;
+            background: #fff;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
@@ -121,93 +114,88 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" placeholder="Enter your password" required>
-                    <div class="show-password">
-                        <input type="checkbox" id="toggle-password"> <label for="toggle-password">Show Password</label>
-                    </div>
                 </div>
                 <button type="submit" class="btn">Login</button>
                 <p style="text-align: center; margin-top: 10px;">or</p>
                 <button type="button" id="toggle-signup" class="btn" style="background-color: #28a745;">Switch to Signup</button>
             </form>
         </div>
-    </div>
 
-    <!-- File Manager -->
-    <div id="filemanager">
-        <h2>File Manager</h2>
-        <button id="add-folder">Add Folder</button>
-        <button id="upload-file">Upload File</button>
-        <div id="file-list"></div>
+        <!-- File Manager -->
+        <div id="file-manager" class="file-manager-container" style="display: none;">
+            <h2>File Manager</h2>
+            <button id="add-folder" class="btn" style="background-color: #6c757d; margin-bottom: 10px;">Add Folder</button>
+            <button id="upload-file" class="btn" style="background-color: #17a2b8;">Upload File</button>
+            <div id="file-list" class="file-list"></div>
+        </div>
     </div>
 
     <script>
         const authContainer = document.getElementById('auth-container');
-        const authForm = document.getElementById('auth-form');
-        const formTitle = document.getElementById('form-title');
-        const toggleSignupBtn = document.getElementById('toggle-signup');
-        const fileManagerDiv = document.getElementById('filemanager');
+        const fileManagerContainer = document.getElementById('file-manager');
         const fileList = document.getElementById('file-list');
+
+        const authForm = document.getElementById('auth-form');
+        const toggleSignupBtn = document.getElementById('toggle-signup');
+        const addFolderBtn = document.getElementById('add-folder');
+        const uploadFileBtn = document.getElementById('upload-file');
 
         let isSignup = false;
 
-        // Toggle between login and signup forms
+        // Toggle Login/Signup
         toggleSignupBtn.addEventListener('click', () => {
             isSignup = !isSignup;
-            formTitle.textContent = isSignup ? 'Signup' : 'Login';
+            document.getElementById('form-title').textContent = isSignup ? 'Signup' : 'Login';
             toggleSignupBtn.textContent = isSignup ? 'Switch to Login' : 'Switch to Signup';
-            authForm.querySelector('button[type="submit"]').textContent = isSignup ? 'Signup' : 'Login';
         });
 
-        // Show/Hide password toggle
-        document.getElementById('toggle-password').addEventListener('change', (e) => {
-            const passwordField = document.getElementById('password');
-            passwordField.type = e.target.checked ? 'text' : 'password';
-        });
-
-        // Handle login/signup submission
+        // Handle Form Submission
         authForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (isSignup) {
-                alert(`Signup successful for user: ${username}`);
-            } else {
-                alert(`Login successful for user: ${username}`);
-            }
-
-            // Hide the login/signup form and show the file manager
+            alert(isSignup ? 'Signup successful!' : 'Login successful!');
             authContainer.style.display = 'none';
-            fileManagerDiv.style.display = 'block';
+            fileManagerContainer.style.display = 'block';
         });
 
-        // File Manager Functionality
-        document.getElementById('add-folder').addEventListener('click', () => {
+        // Add Folder Functionality
+        addFolderBtn.addEventListener('click', () => {
             const folderName = prompt('Enter folder name:');
             if (folderName) {
-                const folder = document.createElement('div');
-                folder.className = 'file-item';
-                folder.textContent = folderName;
-                fileList.appendChild(folder);
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'file-item';
+                folderDiv.textContent = folderName;
+
+                // Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', () => folderDiv.remove());
+
+                folderDiv.appendChild(deleteBtn);
+                fileList.appendChild(folderDiv);
             }
         });
 
-        document.getElementById('upload-file').addEventListener('click', () => {
+        // Upload File Functionality
+        uploadFileBtn.addEventListener('click', () => {
             const fileName = prompt('Enter file name:');
             if (fileName) {
-                const file = document.createElement('div');
-                file.className = 'file-item';
-                file.textContent = fileName;
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.addEventListener('click', () => file.remove());
-                file.appendChild(deleteButton);
-                fileList.appendChild(file);
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'file-item';
+                fileDiv.textContent = fileName;
+
+                // Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', () => fileDiv.remove());
+
+                fileDiv.appendChild(deleteBtn);
+                fileList.appendChild(fileDiv);
             }
         });
     </script>
 </body>
 </html>
+
 
 
 
