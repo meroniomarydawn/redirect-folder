@@ -3,18 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login and Signup with File Manager</title>
+    <title>Login, Signup, and File Manager</title>
+    <link href="https://cdn.syncfusion.com/ej2/20.3.47/material.css" rel="stylesheet">
+    <script src="https://cdn.syncfusion.com/ej2/20.3.47/dist/ej2.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             background-color: #f4f4f9;
+        }
+
+        .container {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
-        .container {
+
+        .form-container {
             width: 100%;
             max-width: 400px;
             background: #fff;
@@ -22,195 +29,171 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         .form-group {
             margin-bottom: 15px;
         }
-        label {
-            font-weight: bold;
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
         }
-        input {
+
+        .form-group input {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        .checkbox-group {
+
+        .form-group .show-password {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 5px;
             margin-top: 5px;
         }
-        button {
+
+        .btn {
             width: 100%;
             padding: 10px;
-            background-color: #5cb85c;
+            background: #007bff;
+            color: #fff;
             border: none;
-            color: white;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
         }
-        button:hover {
-            background-color: #4cae4c;
+
+        .btn:hover {
+            background: #0056b3;
         }
-        .file-manager {
+
+        #filemanager {
             display: none;
-            width: 100%;
-            max-width: 500px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .file-drop-area {
-            margin-top: 20px;
-            padding: 20px;
-            border: 2px dashed #ddd;
-            border-radius: 4px;
-            text-align: center;
-            background-color: #f9f9f9;
-            cursor: pointer;
-        }
-        .file-list {
-            margin-top: 20px;
-        }
-        .file-item {
-            margin-bottom: 10px;
-            padding: 10px;
+            width: 80%;
+            height: 80%;
+            margin: 20px auto;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
         }
-        .toggle-form {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #007bff;
-            cursor: pointer;
-        }
-        .toggle-form:hover {
-            text-decoration: underline;
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <!-- Login Form -->
-    <div class="container" id="loginForm">
-        <h2>Login</h2>
-        <form onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="showLoginPassword" onclick="togglePassword('loginPassword')">
-                    <label for="showLoginPassword">Show Password</label>
+    <div class="container">
+        <!-- Login and Signup Form -->
+        <div id="auth-container" class="form-container">
+            <h2 id="form-title">Login</h2>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required>
                 </div>
-            </div>
-            <button type="submit">Login</button>
-        </form>
-        <div class="toggle-form" onclick="showSignup()">Don't have an account? Sign up</div>
-    </div>
-
-    <!-- Signup Form -->
-    <div class="container" id="signupForm" style="display: none;">
-        <h2>Signup</h2>
-        <form onsubmit="handleSignup(event)">
-            <div class="form-group">
-                <label for="fullname">Full Name</label>
-                <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="signupEmail" name="email" placeholder="Enter your email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="signupPassword" name="password" placeholder="Create a password" required>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="showSignupPassword" onclick="togglePassword('signupPassword')">
-                    <label for="showSignupPassword">Show Password</label>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <div class="show-password">
+                        <input type="checkbox" id="toggle-password"> <label for="toggle-password">Show Password</label>
+                    </div>
                 </div>
-            </div>
-            <button type="submit">Sign Up</button>
-        </form>
-        <div class="toggle-form" onclick="showLogin()">Already have an account? Log in</div>
+                <button type="submit" class="btn">Login</button>
+                <p style="text-align: center; margin-top: 10px;">or</p>
+                <button type="button" id="toggle-signup" class="btn" style="background-color: #28a745;">Switch to Signup</button>
+            </form>
+        </div>
     </div>
 
     <!-- File Manager -->
-    <div class="file-manager" id="fileManager">
-        <h2>My Folder</h2>
-        <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
-            Drag & Drop your files here <br> OR <br>
-            <button>Browse Files</button>
-            <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileUpload(event)">
-        </div>
-        <div class="file-list" id="fileList">
-            <h3>Uploaded Files</h3>
-        </div>
-        <button onclick="logout()">Logout</button>
-    </div>
+    <div id="filemanager"></div>
 
     <script>
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            input.type = input.type === "password" ? "text" : "password";
-        }
+        const authContainer = document.getElementById('auth-container');
+        const authForm = document.getElementById('auth-form');
+        const formTitle = document.getElementById('form-title');
+        const toggleSignupBtn = document.getElementById('toggle-signup');
+        const fileManagerDiv = document.getElementById('filemanager');
 
-        function showSignup() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('signupForm').style.display = 'block';
-        }
+        let isSignup = false;
 
-        function showLogin() {
-            document.getElementById('signupForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
+        // Toggle between login and signup forms
+        toggleSignupBtn.addEventListener('click', () => {
+            isSignup = !isSignup;
+            formTitle.textContent = isSignup ? 'Signup' : 'Login';
+            toggleSignupBtn.textContent = isSignup ? 'Switch to Login' : 'Switch to Signup';
+            authForm.querySelector('button[type="submit"]').textContent = isSignup ? 'Signup' : 'Login';
+        });
 
-        function handleLogin(event) {
-            event.preventDefault();
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('fileManager').style.display = 'block';
-        }
+        // Show/Hide password toggle
+        document.getElementById('toggle-password').addEventListener('change', (e) => {
+            const passwordField = document.getElementById('password');
+            passwordField.type = e.target.checked ? 'text' : 'password';
+        });
 
-        function handleSignup(event) {
-            event.preventDefault();
-            document.getElementById('signupForm').style.display = 'none';
-            document.getElementById('fileManager').style.display = 'block';
-        }
+        // Handle login/signup submission
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-        function handleFileUpload(event) {
-            const fileList = document.getElementById('fileList');
-            const files = event.target.files;
-
-            for (let i = 0; i < files.length; i++) {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <span>${files[i].name}</span>
-                    <button onclick="deleteFile(this)">Delete</button>
-                `;
-                fileList.appendChild(fileItem);
+            if (isSignup) {
+                alert(`Signup successful for user: ${username}`);
+            } else {
+                alert(`Login successful for user: ${username}`);
             }
-        }
 
-        function deleteFile(button) {
-            const fileItem = button.parentElement;
-            fileItem.remove();
-        }
+            // Hide the login/signup form and show the file manager
+            authContainer.style.display = 'none';
+            fileManagerDiv.style.display = 'block';
 
-        function logout() {
-            document.getElementById('fileManager').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
+            // Initialize the File Manager
+            initializeFileManager();
+        });
+
+        // Initialize File Manager Function
+        function initializeFileManager() {
+            const fileManager = new ej.filemanager.FileManager({
+                ajaxSettings: {
+                    url: "https://ej2services.syncfusion.com/production/web-services/api/FileManager/FileOperations",
+                    uploadUrl: "https://ej2services.syncfusion.com/production/web-services/api/FileManager/Upload",
+                    downloadUrl: "https://ej2services.syncfusion.com/production/web-services/api/FileManager/Download",
+                    getImageUrl: "https://ej2services.syncfusion.com/production/web-services/api/FileManager/GetImage"
+                },
+                view: "Details",
+                allowMultiSelection: true,
+                toolbarSettings: {
+                    items: [
+                        "NewFolder",
+                        "Upload",
+                        "Delete",
+                        "Download",
+                        "Rename",
+                        "SortBy",
+                        "Refresh",
+                        "View"
+                    ]
+                },
+                contextMenuSettings: {
+                    file: ["Open", "Download", "Rename", "Delete"],
+                    folder: ["Open", "Rename", "Delete"],
+                    layout: ["SortBy", "View", "Refresh"]
+                }
+            });
+
+            fileManager.appendTo("#filemanager");
         }
     </script>
 </body>
 </html>
+
 
 
 
