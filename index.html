@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login, Signup, and File Manager</title>
+    <title>Login and File Browser</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,7 +21,7 @@
 
         .form-container, .file-manager-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             background: #fff;
             padding: 20px;
             border-radius: 8px;
@@ -68,27 +68,39 @@
             margin-top: 20px;
         }
 
-        .file-list {
+        .file-browser {
             margin-top: 10px;
             border: 1px solid #ddd;
             padding: 10px;
             border-radius: 4px;
             background: #f9f9f9;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .file-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 5px 10px;
+            justify-content: space-between;
+            padding: 10px;
             margin-bottom: 5px;
             background: #fff;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
 
+        .file-item span {
+            display: flex;
+            align-items: center;
+        }
+
+        .file-item img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
         .file-item button {
-            margin-left: 10px;
             background: #dc3545;
             color: white;
             border: none;
@@ -103,53 +115,57 @@
 </head>
 <body>
     <div class="container">
-        <!-- Login and Signup Form -->
+        <!-- Login and Signup -->
         <div id="auth-container" class="form-container">
             <h2 id="form-title">Login</h2>
             <form id="auth-form">
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter your username" required>
+                    <input type="text" id="username" placeholder="Enter username" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <input type="password" id="password" placeholder="Enter password" required>
                 </div>
                 <button type="submit" class="btn">Login</button>
                 <p style="text-align: center; margin-top: 10px;">or</p>
-                <button type="button" id="toggle-signup" class="btn" style="background-color: #28a745;">Switch to Signup</button>
+                <button type="button" id="toggle-auth" class="btn" style="background-color: #28a745;">Switch to Signup</button>
             </form>
         </div>
 
         <!-- File Manager -->
         <div id="file-manager" class="file-manager-container" style="display: none;">
-            <h2>File Manager</h2>
-            <button id="add-folder" class="btn" style="background-color: #6c757d; margin-bottom: 10px;">Add Folder</button>
-            <button id="upload-file" class="btn" style="background-color: #17a2b8;">Upload File</button>
-            <div id="file-list" class="file-list"></div>
+            <h2>File Browser</h2>
+            <div class="file-manager">
+                <button id="create-folder" class="btn" style="background-color: #6c757d; margin-bottom: 10px;">Add Folder</button>
+                <input type="file" id="upload-file" style="display: none;" multiple>
+                <button id="upload-btn" class="btn" style="background-color: #17a2b8; margin-bottom: 10px;">Upload File</button>
+                <div id="file-browser" class="file-browser"></div>
+            </div>
         </div>
     </div>
 
     <script>
         const authContainer = document.getElementById('auth-container');
         const fileManagerContainer = document.getElementById('file-manager');
-        const fileList = document.getElementById('file-list');
-
         const authForm = document.getElementById('auth-form');
-        const toggleSignupBtn = document.getElementById('toggle-signup');
-        const addFolderBtn = document.getElementById('add-folder');
-        const uploadFileBtn = document.getElementById('upload-file');
+        const toggleAuthButton = document.getElementById('toggle-auth');
+
+        const createFolderButton = document.getElementById('create-folder');
+        const uploadFileInput = document.getElementById('upload-file');
+        const uploadFileButton = document.getElementById('upload-btn');
+        const fileBrowser = document.getElementById('file-browser');
 
         let isSignup = false;
 
-        // Toggle Login/Signup
-        toggleSignupBtn.addEventListener('click', () => {
+        // Toggle between login and signup
+        toggleAuthButton.addEventListener('click', () => {
             isSignup = !isSignup;
             document.getElementById('form-title').textContent = isSignup ? 'Signup' : 'Login';
-            toggleSignupBtn.textContent = isSignup ? 'Switch to Login' : 'Switch to Signup';
+            toggleAuthButton.textContent = isSignup ? 'Switch to Login' : 'Switch to Signup';
         });
 
-        // Handle Form Submission
+        // Handle login/signup form
         authForm.addEventListener('submit', (e) => {
             e.preventDefault();
             alert(isSignup ? 'Signup successful!' : 'Login successful!');
@@ -157,44 +173,49 @@
             fileManagerContainer.style.display = 'block';
         });
 
-        // Add Folder Functionality
-        addFolderBtn.addEventListener('click', () => {
+        // Add folder functionality
+        createFolderButton.addEventListener('click', () => {
             const folderName = prompt('Enter folder name:');
             if (folderName) {
                 const folderDiv = document.createElement('div');
                 folderDiv.className = 'file-item';
-                folderDiv.textContent = folderName;
-
-                // Delete button
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.addEventListener('click', () => folderDiv.remove());
-
-                folderDiv.appendChild(deleteBtn);
-                fileList.appendChild(folderDiv);
+                folderDiv.innerHTML = `
+                    <span>
+                        <img src="https://img.icons8.com/material-outlined/24/000000/folder-invoices.png" alt="Folder">
+                        ${folderName}
+                    </span>
+                    <button>Delete</button>
+                `;
+                folderDiv.querySelector('button').addEventListener('click', () => folderDiv.remove());
+                fileBrowser.appendChild(folderDiv);
             }
         });
 
-        // Upload File Functionality
-        uploadFileBtn.addEventListener('click', () => {
-            const fileName = prompt('Enter file name:');
-            if (fileName) {
+        // Upload file functionality
+        uploadFileButton.addEventListener('click', () => {
+            uploadFileInput.click();
+        });
+
+        uploadFileInput.addEventListener('change', (e) => {
+            Array.from(e.target.files).forEach(file => {
                 const fileDiv = document.createElement('div');
                 fileDiv.className = 'file-item';
-                fileDiv.textContent = fileName;
-
-                // Delete button
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.addEventListener('click', () => fileDiv.remove());
-
-                fileDiv.appendChild(deleteBtn);
-                fileList.appendChild(fileDiv);
-            }
+                fileDiv.innerHTML = `
+                    <span>
+                        <img src="https://img.icons8.com/material-outlined/24/000000/file.png" alt="File">
+                        ${file.name}
+                    </span>
+                    <button>Delete</button>
+                `;
+                fileDiv.querySelector('button').addEventListener('click', () => fileDiv.remove());
+                fileBrowser.appendChild(fileDiv);
+            });
+            uploadFileInput.value = ''; // Clear the input
         });
     </script>
 </body>
 </html>
+
 
 
 
