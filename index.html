@@ -83,10 +83,6 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-    .file-upload-form input, .file-upload-form button {
-      padding: 10px;
-      margin: 5px 0;
-    }
   </style>
 </head>
 <body>
@@ -135,8 +131,8 @@
       <p>No files in this folder.</p>
     </div>
     <form id="fileUploadForm" class="file-upload-form">
-      <input type="text" id="fileName" placeholder="Enter file name" required>
-      <button type="submit">Add File</button>
+      <input type="file" id="fileInput" multiple>
+      <button type="submit">Upload Files</button>
     </form>
     <button id="backToFolders">Back to Folders</button>
   </div>
@@ -148,6 +144,7 @@
     const folderView = document.getElementById('folderView');
     const folders = document.querySelectorAll('.folder');
     const fileList = document.getElementById('fileList');
+    const fileInput = document.getElementById('fileInput');
     const fileUploadForm = document.getElementById('fileUploadForm');
     const backToFolders = document.getElementById('backToFolders');
     const currentFolderName = document.getElementById('currentFolderName');
@@ -189,14 +186,14 @@
       folderContainer.style.display = 'block';
     });
 
-    // Add file
+    // Handle file upload
     fileUploadForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      const fileName = document.getElementById('fileName').value;
-      if (fileName && currentFolder) {
-        folderData[currentFolder].push(fileName);
-        document.getElementById('fileName').value = '';
+      const files = fileInput.files;
+      if (files.length && currentFolder) {
+        Array.from(files).forEach(file => folderData[currentFolder].push(file.name));
         renderFiles();
+        fileInput.value = '';
       }
     });
 
@@ -218,6 +215,7 @@
   </script>
 </body>
 </html>
+
 
 
 
