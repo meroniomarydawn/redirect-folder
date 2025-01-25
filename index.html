@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login, Signup, and Folder View</title>
+  <title>Login, Signup, and Folder Management</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,42 +16,16 @@
       margin: 0;
       flex-direction: column;
     }
-    .hidden {
+    .container {
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    .login-signup, .folder-management {
       display: none;
     }
-    .container {
-      text-align: center;
-      background: white;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 300px;
-    }
-    .container h1 {
-      margin-bottom: 20px;
-    }
-    .input {
+    .login-signup.active, .folder-management.active {
       display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      color: white;
-      background-color: #007BFF;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .btn:hover {
-      background-color: #0056b3;
     }
     .folders {
       display: flex;
@@ -65,6 +39,7 @@
       text-align: center;
       text-decoration: none;
       color: #333;
+      cursor: pointer;
     }
     .folder img {
       width: 100px;
@@ -73,109 +48,139 @@
     .folder:hover {
       color: #007BFF;
     }
+    .file-list {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .file-item {
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-  <!-- Login Section -->
-  <div id="login-view" class="container">
-    <h1>Login</h1>
-    <form id="login-form">
-      <input type="text" id="login-username" placeholder="Username" class="input" required>
-      <input type="password" id="login-password" placeholder="Password" class="input" required>
-      <button type="submit" class="btn">Login</button>
-    </form>
-    <p>Don't have an account? <a href="#" id="go-to-signup">Sign Up</a></p>
-  </div>
+  <div class="container">
+    <!-- Login and Signup Section -->
+    <div class="login-signup active" id="loginSignup">
+      <h1>Login / Signup</h1>
+      <form id="loginForm">
+        <input type="text" id="username" placeholder="Enter Username" required><br><br>
+        <input type="password" id="password" placeholder="Enter Password" required><br><br>
+        <button type="submit">Login</button>
+      </form>
+      <p>Don't have an account? <a href="#" id="signupLink">Sign Up</a></p>
+    </div>
 
-  <!-- Signup Section -->
-  <div id="signup-view" class="container hidden">
-    <h1>Sign Up</h1>
-    <form id="signup-form">
-      <input type="text" id="signup-username" placeholder="Username" class="input" required>
-      <input type="password" id="signup-password" placeholder="Password" class="input" required>
-      <button type="submit" class="btn">Sign Up</button>
-    </form>
-    <p>Already have an account? <a href="#" id="go-to-login">Login</a></p>
-  </div>
-
-  <!-- Folder View Section -->
-  <div id="folder-view" class="container hidden">
-    <h1>File Folders</h1>
-    <p>Select a folder to navigate:</p>
-    <div class="folders">
-      <a href="folder1/" class="folder">
-        <img src="https://img.icons8.com/color/100/folder-invoices.png" alt="Folder 1">
-        <p>Folder 1</p>
-      </a>
+    <!-- Folder Management Section -->
+    <div class="folder-management" id="folderManagement">
+      <h1>File Folders</h1>
+      <p>Select a folder to navigate:</p>
+      <div class="folders" id="folders">
+        <!-- Folder List -->
+        <div class="folder" data-folder="Folder 1">
+          <img src="https://img.icons8.com/color/100/folder.png" alt="Folder 1">
+          <p> </p>
+        </div>
+      </div>
+      <button id="createFolderBtn">Create New Folder</button>
+      <div class="file-list" id="fileList"></div>
+      <form id="fileUploadForm">
+        <input type="text" id="newFileName" placeholder="Enter file name">
+        <button type="submit">Add File</button>
+      </form>
     </div>
   </div>
 
   <script>
     // Elements
-    const loginView = document.getElementById('login-view');
-    const signupView = document.getElementById('signup-view');
-    const folderView = document.getElementById('folder-view');
-    const goToSignup = document.getElementById('go-to-signup');
-    const goToLogin = document.getElementById('go-to-login');
-    const loginForm = document.getElementById('login-form');
-    const signupForm = document.getElementById('signup-form');
+    const loginSignup = document.getElementById('loginSignup');
+    const folderManagement = document.getElementById('folderManagement');
+    const foldersContainer = document.getElementById('folders');
+    const fileList = document.getElementById('fileList');
+    const fileUploadForm = document.getElementById('fileUploadForm');
+    const newFileName = document.getElementById('newFileName');
+    const createFolderBtn = document.getElementById('createFolderBtn');
 
-    // Mock user data (Replace with backend logic)
-    const users = [];
+    // Mock data for folders and files
+    const folders = {
+      "Folder 1": [],
+    };
+    let currentFolder = null;
 
-    // Switch to Signup
-    goToSignup.addEventListener('click', (e) => {
+    // Login simulation
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      loginView.classList.add('hidden');
-      signupView.classList.remove('hidden');
+      loginSignup.classList.remove('active');
+      folderManagement.classList.add('active');
     });
 
-    // Switch to Login
-    goToLogin.addEventListener('click', (e) => {
-      e.preventDefault();
-      signupView.classList.add('hidden');
-      loginView.classList.remove('hidden');
-    });
-
-    // Handle Signup
-    signupForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const username = document.getElementById('signup-username').value;
-      const password = document.getElementById('signup-password').value;
-
-      // Check if username already exists
-      if (users.some((user) => user.username === username)) {
-        alert('Username already exists. Please choose a different one.');
-        return;
+    // Folder click event
+    foldersContainer.addEventListener('click', function (e) {
+      if (e.target.closest('.folder')) {
+        const folderName = e.target.closest('.folder').dataset.folder;
+        openFolder(folderName);
       }
-
-      // Add user to the mock database
-      users.push({ username, password });
-      alert('Signup successful! You can now log in.');
-      signupView.classList.add('hidden');
-      loginView.classList.remove('hidden');
     });
 
-    // Handle Login
-    loginForm.addEventListener('submit', (e) => {
+    // File upload form
+    fileUploadForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      const username = document.getElementById('login-username').value;
-      const password = document.getElementById('login-password').value;
-
-      // Check credentials
-      const user = users.find((user) => user.username === username && user.password === password);
-      if (!user) {
-        alert('Invalid username or password.');
-        return;
+      if (currentFolder && newFileName.value) {
+        folders[currentFolder].push(newFileName.value);
+        newFileName.value = '';
+        renderFiles(currentFolder);
       }
-
-      // Show folder view
-      loginView.classList.add('hidden');
-      folderView.classList.remove('hidden');
     });
+
+    // Create new folder
+    createFolderBtn.addEventListener('click', function () {
+      const folderName = prompt('Enter folder name:');
+      if (folderName && !folders[folderName]) {
+        folders[folderName] = [];
+        renderFolders();
+      }
+    });
+
+    // Render folders
+    function renderFolders() {
+      foldersContainer.innerHTML = '';
+      for (const folderName in folders) {
+        const folderDiv = document.createElement('div');
+        folderDiv.classList.add('folder');
+        folderDiv.dataset.folder = folderName;
+        folderDiv.innerHTML = `
+          <img src="https://img.icons8.com/color/100/folder.png" alt="${folderName}">
+          <p>${folderName}</p>
+        `;
+        foldersContainer.appendChild(folderDiv);
+      }
+    }
+
+    // Render files in a folder
+    function renderFiles(folderName) {
+      fileList.innerHTML = `<h3>Files in ${folderName}:</h3>`;
+      folders[folderName].forEach((file, index) => {
+        const fileDiv = document.createElement('div');
+        fileDiv.classList.add('file-item');
+        fileDiv.textContent = `${index + 1}. ${file}`;
+        fileList.appendChild(fileDiv);
+      });
+    }
+
+    // Open folder
+    function openFolder(folderName) {
+      currentFolder = folderName;
+      renderFiles(folderName);
+    }
+
+    // Initial render
+    renderFolders();
   </script>
 </body>
 </html>
+
 
 
 
