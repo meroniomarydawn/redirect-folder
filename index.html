@@ -1,195 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Your Folders</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login, Signup, and Folder View</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+    }
+    .hidden {
+      display: none;
+    }
+    .container {
+      text-align: center;
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+    .container h1 {
+      margin-bottom: 20px;
+    }
+    .input {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: white;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    .folders {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .folder {
+      width: 120px;
+      margin: 10px;
+      text-align: center;
+      text-decoration: none;
+      color: #333;
+    }
+    .folder img {
+      width: 100px;
+      height: 100px;
+    }
+    .folder:hover {
+      color: #007BFF;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome, <%= user.username %>!</h1>
-  <img src="<%= user.avatar %>" alt="Avatar" width="50">
-  <a href="/logout">Logout</a>
-  <h2>Create a New Folder</h2>
-  <form action="/folders" method="POST" enctype="multipart/form-data">
-    <input type="text" name="name" placeholder="Folder Name" required>
-    <input type="file" name="icon">
-    <button type="submit">Create</button>
-  </form>
-  <h2>Your Folders:</h2>
-  <ul>
-    <% folders.forEach(folder => { %>
-      <li>
-        <img src="<%= folder.icon %>" alt="Folder Icon" width="50">
-        <a href="/folders/<%= folder._id %>"><%= folder.name %></a>
-      </li>
-    <% }) %>
-  </ul>
+  <!-- Login Section -->
+  <div id="login-view" class="container">
+    <h1>Login</h1>
+    <form id="login-form">
+      <input type="text" id="login-username" placeholder="Username" class="input" required>
+      <input type="password" id="login-password" placeholder="Password" class="input" required>
+      <button type="submit" class="btn">Login</button>
+    </form>
+    <p>Don't have an account? <a href="#" id="go-to-signup">Sign Up</a></p>
+  </div>
+
+  <!-- Signup Section -->
+  <div id="signup-view" class="container hidden">
+    <h1>Sign Up</h1>
+    <form id="signup-form">
+      <input type="text" id="signup-username" placeholder="Username" class="input" required>
+      <input type="password" id="signup-password" placeholder="Password" class="input" required>
+      <button type="submit" class="btn">Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="#" id="go-to-login">Login</a></p>
+  </div>
+
+  <!-- Folder View Section -->
+  <div id="folder-view" class="container hidden">
+    <h1>File Folders</h1>
+    <p>Select a folder to navigate:</p>
+    <div class="folders">
+      <a href="folder1/" class="folder">
+        <img src="https://img.icons8.com/color/100/folder-invoices.png" alt="Folder 1">
+        <p>Folder 1</p>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Elements
+    const loginView = document.getElementById('login-view');
+    const signupView = document.getElementById('signup-view');
+    const folderView = document.getElementById('folder-view');
+    const goToSignup = document.getElementById('go-to-signup');
+    const goToLogin = document.getElementById('go-to-login');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+
+    // Mock user data (Replace with backend logic)
+    const users = [];
+
+    // Switch to Signup
+    goToSignup.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginView.classList.add('hidden');
+      signupView.classList.remove('hidden');
+    });
+
+    // Switch to Login
+    goToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      signupView.classList.add('hidden');
+      loginView.classList.remove('hidden');
+    });
+
+    // Handle Signup
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('signup-username').value;
+      const password = document.getElementById('signup-password').value;
+
+      // Check if username already exists
+      if (users.some((user) => user.username === username)) {
+        alert('Username already exists. Please choose a different one.');
+        return;
+      }
+
+      // Add user to the mock database
+      users.push({ username, password });
+      alert('Signup successful! You can now log in.');
+      signupView.classList.add('hidden');
+      loginView.classList.remove('hidden');
+    });
+
+    // Handle Login
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+
+      // Check credentials
+      const user = users.find((user) => user.username === username && user.password === password);
+      if (!user) {
+        alert('Invalid username or password.');
+        return;
+      }
+
+      // Show folder view
+      loginView.classList.add('hidden');
+      folderView.classList.remove('hidden');
+    });
+  </script>
 </body>
 </html>
 
-require('dotenv').config();
-const express = require('express');
-const session = require('express-session');
-const passport = require('passport');
-const GitHubStrategy = require('passport-github2').Strategy;
-const mongoose = require('mongoose');
-const multer = require('multer');
-const path = require('path');
-
-// Initialize app and MongoDB
-const app = express();
-mongoose.connect('mongodb://localhost:27017/githubFolders', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-// Schemas and Models
-const userSchema = new mongoose.Schema({
-  githubId: String,
-  username: String,
-  avatar: String,
-});
-const folderSchema = new mongoose.Schema({
-  userId: String,
-  name: String,
-  icon: String,
-  files: [String],
-});
-
-const User = mongoose.model('User', userSchema);
-const Folder = mongoose.model('Folder', folderSchema);
-
-// Configure Multer for file uploads
-const upload = multer({ dest: 'uploads/' });
-
-// Middleware
-app.use(
-  session({
-    secret: 'your_secret_key',
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-app.use(passport.initialize());
-app.use(passport.session());
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
-
-// Passport GitHub OAuth Strategy
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: 'http://localhost:3000/auth/github/callback',
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      let user = await User.findOne({ githubId: profile.id });
-      if (!user) {
-        user = await User.create({
-          githubId: profile.id,
-          username: profile.username,
-          avatar: profile._json.avatar_url,
-        });
-      }
-      return done(null, user);
-    }
-  )
-);
-
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  const user = await User.findById(id);
-  done(null, user);
-});
-
-// Routes
-app.get('/', (req, res) => {
-  if (req.isAuthenticated()) {
-    return res.redirect('/folders');
-  }
-  res.render('index');
-});
-
-// GitHub Login
-app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
-
-// GitHub Callback
-app.get(
-  '/auth/github/callback',
-  passport.authenticate('github', { failureRedirect: '/' }),
-  (req, res) => {
-    res.redirect('/folders');
-  }
-);
-
-// Logout
-app.get('/logout', (req, res) => {
-  req.logout((err) => {
-    if (err) return next(err);
-    res.redirect('/');
-  });
-});
-
-// Display folders for logged-in user
-app.get('/folders', async (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect('/');
-  }
-  const folders = await Folder.find({ userId: req.user.id });
-  res.render('folders', { user: req.user, folders });
-});
-
-// Create a new folder
-app.post('/folders', upload.single('icon'), async (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect('/');
-  }
-  const newFolder = new Folder({
-    userId: req.user.id,
-    name: req.body.name,
-    icon: req.file ? `/uploads/${req.file.filename}` : '/default-icon.png',
-    files: [],
-  });
-  await newFolder.save();
-  res.redirect('/folders');
-});
-
-// Upload a file to a folder
-app.post('/folders/:id/files', upload.single('file'), async (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect('/');
-  }
-  const folder = await Folder.findById(req.params.id);
-  if (folder.userId !== req.user.id) {
-    return res.status(403).send('Unauthorized');
-  }
-  folder.files.push(`/uploads/${req.file.filename}`);
-  await folder.save();
-  res.redirect(`/folders/${req.params.id}`);
-});
-
-// View a folder and its files
-app.get('/folders/:id', async (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect('/');
-  }
-  const folder = await Folder.findById(req.params.id);
-  if (folder.userId !== req.user.id) {
-    return res.status(403).send('Unauthorized');
-  }
-  res.render('folder', { user: req.user, folder });
-});
-
-// Serve static files and uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
 
 
 
