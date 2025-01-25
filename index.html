@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Folder View</title>
+  <title>Folder View with File Preview</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -82,6 +82,52 @@
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      cursor: pointer;
+      background-color: #fff;
+      transition: background-color 0.3s;
+    }
+    .file-item:hover {
+      background-color: #f7f7f7;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      border-radius: 8px;
+    }
+    .modal h3 {
+      margin: 0 0 10px;
+    }
+    .modal p {
+      white-space: pre-wrap;
+      text-align: left;
+    }
+    .modal .close {
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal .close:hover {
+      background-color: #0056b3;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
     }
   </style>
 </head>
@@ -137,6 +183,14 @@
     <button id="backToFolders">Back to Folders</button>
   </div>
 
+  <!-- File Preview Modal -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal" id="fileModal">
+    <h3 id="modalTitle">File Preview</h3>
+    <p id="modalContent"></p>
+    <button class="close" id="closeModal">Close</button>
+  </div>
+
   <script>
     // Elements
     const loginSignup = document.getElementById('loginSignup');
@@ -148,6 +202,11 @@
     const fileUploadForm = document.getElementById('fileUploadForm');
     const backToFolders = document.getElementById('backToFolders');
     const currentFolderName = document.getElementById('currentFolderName');
+    const fileModal = document.getElementById('fileModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    const closeModal = document.getElementById('closeModal');
 
     // Mock Data
     const folderData = {
@@ -191,7 +250,7 @@
       e.preventDefault();
       const files = fileInput.files;
       if (files.length && currentFolder) {
-        Array.from(files).forEach(file => folderData[currentFolder].push(file.name));
+        Array.from(files).forEach(file => folderData[currentFolder].push(file));
         renderFiles();
         fileInput.value = '';
       }
@@ -207,14 +266,39 @@
         files.forEach((file, index) => {
           const fileDiv = document.createElement('div');
           fileDiv.classList.add('file-item');
-          fileDiv.textContent = `${index + 1}. ${file}`;
+          fileDiv.textContent = `${index + 1}. ${file.name}`;
+          fileDiv.addEventListener('click', () => previewFile(file));
           fileList.appendChild(fileDiv);
         });
       }
     }
+
+    // Preview file content
+    function previewFile(file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        modalTitle.textContent = file.name;
+        modalContent.textContent = e.target.result;
+        fileModal.style.display = 'block';
+        modalOverlay.style.display = 'block';
+      };
+      reader.readAsText(file);
+    }
+
+    // Close modal
+    closeModal.addEventListener('click', () => {
+      fileModal.style.display = 'none';
+      modalOverlay.style.display = 'none';
+    });
+
+    modalOverlay.addEventListener('click', () => {
+      fileModal.style.display = 'none';
+      modalOverlay.style.display = 'none';
+    });
   </script>
 </body>
 </html>
+
 
 
 
