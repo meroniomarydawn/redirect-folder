@@ -84,50 +84,45 @@
       border-radius: 5px;
       cursor: pointer;
       background-color: #fff;
-      transition: background-color 0.3s;
     }
     .file-item:hover {
-      background-color: #f7f7f7;
+      background-color: #f0f0f0;
     }
     .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #fff;
-      padding: 20px;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-      border-radius: 8px;
-    }
-    .modal h3 {
-      margin: 0 0 10px;
-    }
-    .modal p {
-      white-space: pre-wrap;
-      text-align: left;
-    }
-    .modal .close {
-      background-color: #007BFF;
-      color: #fff;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .modal .close:hover {
-      background-color: #0056b3;
-    }
-    .modal-overlay {
       display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 999;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 90%;
+      max-height: 90%;
+      overflow: auto;
+    }
+    .modal-content img {
+      max-width: 100%;
+      height: auto;
+    }
+    .modal-close {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-close:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
@@ -183,12 +178,10 @@
     <button id="backToFolders">Back to Folders</button>
   </div>
 
-  <!-- File Preview Modal -->
-  <div class="modal-overlay" id="modalOverlay"></div>
-  <div class="modal" id="fileModal">
-    <h3 id="modalTitle">File Preview</h3>
-    <p id="modalContent"></p>
-    <button class="close" id="closeModal">Close</button>
+  <!-- Modal for File Preview -->
+  <div id="fileModal" class="modal">
+    <div class="modal-content" id="modalContent"></div>
+    <button class="modal-close" id="closeModal">Close</button>
   </div>
 
   <script>
@@ -203,8 +196,6 @@
     const backToFolders = document.getElementById('backToFolders');
     const currentFolderName = document.getElementById('currentFolderName');
     const fileModal = document.getElementById('fileModal');
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalTitle = document.getElementById('modalTitle');
     const modalContent = document.getElementById('modalContent');
     const closeModal = document.getElementById('closeModal');
 
@@ -250,7 +241,7 @@
       e.preventDefault();
       const files = fileInput.files;
       if (files.length && currentFolder) {
-        Array.from(files).forEach(file => folderData[currentFolder].push(file));
+        Array.from(files).forEach(file => folderData[currentFolder].push({ name: file.name, url: URL.createObjectURL(file) }));
         renderFiles();
         fileInput.value = '';
       }
@@ -267,37 +258,41 @@
           const fileDiv = document.createElement('div');
           fileDiv.classList.add('file-item');
           fileDiv.textContent = `${index + 1}. ${file.name}`;
-          fileDiv.addEventListener('click', () => previewFile(file));
+          fileDiv.dataset.url = file.url;
+          fileDiv.addEventListener('click', () => previewFile(file.url));
           fileList.appendChild(fileDiv);
         });
       }
     }
 
-    // Preview file content
-    function previewFile(file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        modalTitle.textContent = file.name;
-        modalContent.textContent = e.target.result;
-        fileModal.style.display = 'block';
-        modalOverlay.style.display = 'block';
-      };
-      reader.readAsText(file);
+    // Preview file
+    function previewFile(url) {
+      modalContent.innerHTML = '';
+      const fileType = url.split('.').pop().toLowerCase();
+      if (['png', 'jpg', 'jpeg', 'gif'].includes(fileType)) {
+        const img = document.createElement('img');
+        img.src = url;
+        modalContent.appendChild(img);
+      } else if (fileType === 'pdf') {
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.style.width = '100%';
+        iframe.style.height = '500px';
+        modalContent.appendChild(iframe);
+      } else {
+        modalContent.textContent = 'Preview not available for this file type.';
+      }
+      fileModal.style.display = 'flex';
     }
 
     // Close modal
     closeModal.addEventListener('click', () => {
       fileModal.style.display = 'none';
-      modalOverlay.style.display = 'none';
-    });
-
-    modalOverlay.addEventListener('click', () => {
-      fileModal.style.display = 'none';
-      modalOverlay.style.display = 'none';
     });
   </script>
 </body>
 </html>
+
 
 
 
