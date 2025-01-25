@@ -151,10 +151,19 @@
     <p>Select a folder to navigate:</p>
     <div class="folders" id="folders">
       <div class="folder" data-folder="Folder 1">
-        <img src="https://img.icons8.com/color/100/folder-invoices.png" alt="Folder">
-        <p>Folder</p>
+        <img src="https://img.icons8.com/color/100/folder-invoices.png" alt="Folder 1">
+        <p>Folder 1</p>
       </div>
-     
+      <div class="folder" data-folder="Folder 2">
+        <img src="https://img.icons8.com/color/100/folder.png" alt="Folder 2">
+        <p>Folder 2</p>
+      </div>
+      <div class="folder" data-folder="Folder 3">
+        <img src="https://img.icons8.com/color/100/folder-documents.png" alt="Folder 3">
+        <p>Folder 3</p>
+      </div>
+    </div>
+  </div>
 
   <!-- Folder View Section -->
   <div id="folderView" class="folder-view">
@@ -192,7 +201,9 @@
 
     // Mock Data
     const folderData = {
-      "Folder: [],
+      "Folder 1": [],
+      "Folder 2": [],
+      "Folder 3": []
     };
     let currentFolder = null;
 
@@ -281,6 +292,7 @@
   </script>
 </body>
 </html>
+
 
 
 
